@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <iostream>
 #include <set>
 #include <string>
 
@@ -17,9 +18,9 @@ public:
     std::shared_ptr<Point> boarder;
 
     // create new game
-    Game() : max_foods(100000) {
+    Game() : max_foods(1000) {
         // generate foods
-        boarder = std::make_shared<Point>(10000, 10000);
+        boarder = std::make_shared<Point>(5000, 5000);
         genFoods();
     }
 
@@ -60,13 +61,47 @@ private:
         }
     }
 
+    void eatFood(std::shared_ptr<User>);
     
 };
 
 void Game::gameTick() {
-    genFoods();
+    std::set<std::string> eatenPlayer;
     for(auto user_iter=users.begin();user_iter!=users.end();user_iter++) {
+        if(eatenPlayer.find(user_iter->first) != eatenPlayer.end()) {
+            continue;
+        }
         user_iter->second->tick(boarder);
+        eatFood(user_iter->second);
+
+        // eat player check
+        for(auto eat_it=users.begin();eat_it!=users.end();eat_it++) {
+            if(eatenPlayer.find(eat_it->first) != eatenPlayer.end()) {
+                continue;
+            }
+            bool eaten = user_iter->second->eatPlayer(eat_it->second);
+            if(eaten) {
+                eatenPlayer.insert(eat_it->first);
+            }
+        }
+    }
+    for(auto it=eatenPlayer.begin();it!=eatenPlayer.end();it++) {
+        users.erase(*it);
+    }
+    genFoods();
+}
+
+void Game::eatFood(std::shared_ptr<User> u) {
+    std::vector<std::shared_ptr<Cell>> eatenFood;
+    for(auto food_iter=foods.begin();food_iter!=foods.end();food_iter++) {
+        bool eaten = u->eatFood(*food_iter);
+        if(eaten) {
+            eatenFood.push_back(*food_iter);
+        }
+    }
+
+    for(auto it=eatenFood.begin();it!=eatenFood.end();it++) {
+        foods.erase(*it);
     }
 }
 

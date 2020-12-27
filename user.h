@@ -21,7 +21,7 @@ public:
     std::queue<std::shared_ptr<Event>> events;
 
     User(std::string &username, double x, double y) : username(username) {
-        std::shared_ptr<Cell> start_cell(new Cell(100, x, y));
+        std::shared_ptr<Cell> start_cell(new Cell(10, x, y));
        
         cells.insert(start_cell); 
         pos = std::make_shared<Point>(x, y);
@@ -72,6 +72,9 @@ public:
 
     void tick(std::shared_ptr<Point> boarder);
     void addMoveEvent(std::shared_ptr<Point> target);
+
+    bool eatFood(std::shared_ptr<Cell> food);
+    bool eatPlayer(std::shared_ptr<User> u);
 };
 
 void User::tick(std::shared_ptr<Point> boarder) {
@@ -87,4 +90,31 @@ void User::addMoveEvent(std::shared_ptr<Point> target) {
     std::shared_ptr<Event> new_event(new Event(EventType::Move, target));
     events.push(new_event);
 }
+
+bool User::eatFood(std::shared_ptr<Cell> food) {
+    for(auto cell_iter=cells.begin();cell_iter!=cells.end();cell_iter++) {
+        double food_dist2 = (*cell_iter)->pos->dist2(food->pos);
+        if(pow((*cell_iter)->radius, 2) > food_dist2) {
+            double new_mass = food->mass + (*cell_iter)->mass;
+            (*cell_iter)->setRadius(new_mass);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool User::eatPlayer(std::shared_ptr<User> u) {
+    auto my_cell = cells.begin();
+    auto other_cell = u->cells.begin();
+
+    if((*my_cell)->mass > (*other_cell)->mass * 1.1
+            && (*my_cell)->radius > (*my_cell)->pos->dist((*other_cell)->pos)) {
+        //eat!
+        double new_mass = (*my_cell)->mass + (*other_cell)->mass;
+        (*my_cell)->setRadius(new_mass);
+        return true;
+    }
+    return false;
+}
+
 #endif

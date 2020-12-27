@@ -1,6 +1,7 @@
 #ifndef CELL_H
 #define CELL_H
 
+#include <iostream>
 #include <memory>
 
 #include "point.h"
@@ -25,6 +26,11 @@ public:
     }
 
     double getRadius() const {return radius;}
+
+    void setRadius(double mass) {
+        this->mass = mass;
+        radius = massToRadius(mass);
+    }
 
 private:
     void eatOther(Cell &other_cell);
