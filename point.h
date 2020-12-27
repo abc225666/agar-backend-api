@@ -9,11 +9,11 @@ public:
     double y;
     Point(double x, double y) : x(x), y(y) {}
 
-    double dist(Point &other) {
-        return sqrt(pow(x-other.x, 2) + pow(y-other.y, 2));
+    double dist(std::shared_ptr<Point> other) {
+        return sqrt(pow(x-other->x, 2) + pow(y-other->y, 2));
     }
-    double deg(Point &other) {
-        return atan2(other.y-y, other.x-x);
+    double deg(std::shared_ptr<Point> other) {
+        return atan2(other->y-y, other->x-x);
     }
 
     double getX() const { return x; }

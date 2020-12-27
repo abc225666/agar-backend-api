@@ -17,13 +17,16 @@ PYBIND11_MODULE(_game, m) {
     py::class_<Game>(m, "Game", py::buffer_protocol())
     .def(py::init<>())
     .def("addUser", &Game::addUser)
+    .def("tick", &Game::gameTick)
+    .def("movePlayer", &Game::addMovePlayerEvent)
     .def_readwrite("foods", &Game::foods)
     .def_readwrite("users", &Game::users);
 
-    py::class_<User, std::shared_ptr<User>>(m, "User", py::buffer_protocol());
+    py::class_<User, std::shared_ptr<User>>(m, "User", py::buffer_protocol())
+    .def_property("pos", &User::getPos, nullptr);
 
     py::class_<Cell, std::shared_ptr<Cell>>(m, "Cell", py::buffer_protocol())
-    .def("getPos", &Cell::getPos)
+    .def_property("pos", &Cell::getPos, nullptr)
     .def_property("radius", &Cell::getRadius, nullptr);
 
     py::class_<Point, std::shared_ptr<Point>>(m, "Point", py::buffer_protocol())
