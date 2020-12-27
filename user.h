@@ -36,7 +36,7 @@ public:
             double deg = (*it)->pos->deg(target);
             double slow_down = 1;
             if((*it)->speed <= 6.5) {
-                slow_down= log10((*it)->speed) + 1;
+                slow_down= log10((*it)->mass) + 1;
             }
             else {
                 (*it)->speed -= 0.5;
